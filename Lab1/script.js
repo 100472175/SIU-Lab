@@ -9,7 +9,7 @@
 // Array to store the circles.
 let circles = [];
 let positions = [];
-
+let curr_pos_mark = [];
 let num_circles = 100;
 
 // Vibration pattern [on, off, on, off, ...]
@@ -38,6 +38,15 @@ function distance_points(lat1, lon1, lat2, lon2) {
   return Math.sqrt(Math.pow(lat2 - lat1, 2) + Math.pow(lon2 - lon1, 2));
 }
 
+var black_cross = L.icon({
+  iconUrl: "cruz.png",
+
+  // 1104 × 1342
+  iconSize: [55, 67],
+  iconAnchor: [26, 35],
+  popupAnchor: [-3, -36],
+});
+
 // Create the map object without specifying the location.
 const mymap = L.map("sample_map").setView([0, 0], 15);
 
@@ -59,6 +68,8 @@ if (navigator.geolocation) {
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 18,
 }).addTo(mymap);
+
+// Create an indicator to show where you are:
 
 // Create the empty pointers and the mark.
 let pointer1 = { X: 0, Y: 0 };
@@ -150,8 +161,20 @@ if (window.DeviceOrientationEvent) {
 if (navigator.geolocation) {
   navigator.geolocation.watchPosition(
     (position) => {
+      if (curr_pos_mark.length > 0) {
+        curr_pos_mark.forEach((p) => {
+          mymap.removeLayer(p);
+        });
+      }
+      curr_pos_mark = [];
       var lat = position.coords.latitude;
       var lon = position.coords.longitude;
+
+      mark_center = L.marker([lat, lon], { icon: black_cross })
+        .bindPopup("Tu ubicación actual.")
+        .openPopup()
+        .addTo(mymap);
+      curr_pos_mark.unshift(mark_center);
 
       positions.forEach((p) => {
         // PREGUNTA: Porque no se puede usar la funcion distance_points?
@@ -208,8 +231,6 @@ if (navigator.geolocation) {
         }
       });
     },
-    (err) => {
-      alert("No se pudo obtener la ubicación");
-    }
+    (err) => {}
   );
 }
