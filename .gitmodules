@@ -1,0 +1,3 @@
+[submodule "labs-content/labs-content/Lab2"]
+	path = labs-content/labs-content/Lab2
+	url = git@github.com:100472175/SIU-Lab2.git
